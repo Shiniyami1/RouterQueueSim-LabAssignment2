@@ -26,7 +26,6 @@ public class QueueSimulator{
     totalSimTime = simT;
     timeForNextArrival = getRandTime(arrivalRate);
     timeForNextDeparture = serviceTime + timeForNextArrival;
-
   }
 
   public double calcAverageWaitingTime(){
@@ -37,31 +36,27 @@ public class QueueSimulator{
       totalWaitTime += node.getDepartureTime() - node.getArrivalTime();
       count++;
     }
-    totalWaitTime = totalWaitTime/count;
-    return totalWaitTime;
+    double averageWaitTime = totalWaitTime/count;
+    return averageWaitTime;
   }
 
   public double runSimulation() {
+   
     while (currTime < totalSimTime) {
-        if (timeForNextArrival < timeForNextDeparture || buffer.isEmpty()) {
+        if (timeForNextDeparture > timeForNextArrival || buffer.isEmpty()) {
             e = Event.ARRIVAL;
-        } else {
+        } 
+        else {
             e = Event.DEPARTURE;
         }
-        if (e == Event.ARRIVAL) {
-            currTime = currTime + timeForNextArrival;
-            Data node = new Data();
-            node.setArrivalTime(currTime);
-            buffer.enqueue(node);
-            timeForNextDeparture -= timeForNextArrival;
-            timeForNextArrival = getRandTime(arrivalRate);
-        }
-        else if (e == Event.DEPARTURE) {
+      
+        if (e == Event.DEPARTURE) { 
             currTime = currTime + timeForNextDeparture;
             Data node = buffer.dequeue();
             node.setDepartureTime(currTime);
             eventQueue.enqueue(node);
             timeForNextArrival -= timeForNextDeparture;
+            
             if (buffer.isEmpty()) {
                 timeForNextDeparture = timeForNextArrival + serviceTime;
             }
@@ -69,6 +64,15 @@ public class QueueSimulator{
                 timeForNextDeparture = serviceTime;
             }
         }
+        else if (e == Event.ARRIVAL) {
+            currTime = currTime + timeForNextArrival;
+            Data node = new Data();
+            node.setArrivalTime(currTime);
+            buffer.enqueue(node);
+            timeForNextDeparture -= timeForNextArrival;
+            timeForNextArrival = getRandTime(arrivalRate);
+        }
+
     }
     return calcAverageWaitingTime();
   }
